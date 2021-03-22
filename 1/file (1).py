@@ -23,8 +23,12 @@ def R(O):
      ((abs(O[1] - 1) / 1.7888543819998317)),
      ((abs(O[2] - 1) / 1.7888543819998317))]
 
+
 ### base parametrs
-m = 5
+m = 10
+romanovskii_koef = [1.69, 2, 2, 2, 2, 2.17, 2.17, 2.29, 2.29, 2.39, 2.39,
+                    2.39, 2.49, 2.49,
+                    2.49, 2.49, 2.62, 2.62, 2.62]
 x1_min, x1_max = -20, 30
 x2_min, x2_max = -25, 10
 y_max, y_min = 270, 170
@@ -92,17 +96,21 @@ for i in range(len(O)):
 print()
 for i in range(len(R)):
     print('Ru' + str(i) + ': ', R[i])
-print()
+print("Критерій Романовського = ", romanovskii_koef[m - 2] )
+
+#перевірка на однорідність
 for i in R:
-    if i > 2:
-        print('Недостатньо даних.')
+    if R[0] > romanovskii_koef[m - 2]:
+        print('Дисперсія не є однорідною')
 else:
-    print('Дисперсія однорідна.')
+    print('Дисперсія є однорідною')
 
 print()
 print(b_0, b_1, b_2)
 if [round((b_0 - b_1 - b_2)), round((b_0 + b_1 - b_2)), round((b_0 - b_1 + b_2))] == [*map(round, [yn1, yn2, yn3])]:
     print("Перевірка успішна.")
+    print([round((b_0 - b_1 - b_2)), round((b_0 + b_1 - b_2)), round((b_0 - b_1 + b_2))])
+    print([*map(round, [yn1, yn2, yn3])])
 else:
     print([round((b_0 - b_1 - b_2)), round((b_0 + b_1 - b_2)), round((b_0 - b_1 + b_2))])
     print([*map(round, [yn1, yn2, yn3])])

@@ -1,4 +1,7 @@
 import random
+import time
+
+start = time.time()
 
 
 def X(start=1, end=20):
@@ -45,3 +48,9 @@ print('Yет = {0}'.format(y_et))
 print('Варіант 203')
 print('max(Y)={0}'.format(max(Y(a))))
 print('Виконав: студент групи ІО-92 Гречаний Євгеній')
+
+stop = time.time()
+if stop - start == 0:
+    print("Час виконання програми менше 0.0000001 секунди")
+else:
+    print("Час виконання програми: ", str(float(stop) - float(start)), 'секунд')

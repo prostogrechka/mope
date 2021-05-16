@@ -1,8 +1,13 @@
 import random, numpy
-
+from scipy.stats import f
 
 def rozpodil_kohren(S_list):
     return max(S_list) / sum(S_list)
+
+def kohren_coef(f1=3, f2=4, probability=0.05):
+    q1 = probability / f1
+    fisher_value = f.ppf(q=1 - q1, dfn=f2, dfd=(f1 - 1) * f2)
+    return fisher_value / (fisher_value + f1 - 1)
 
 
 def rozpodil_student(S_list, y_avr_list, x_n):
@@ -104,7 +109,7 @@ print(Y)
 print('Середні значення відгуку по рядках: ', end='')
 print(*y_avr_list, sep=" | ")
 print("Перевірка за критерієм Кохрена: ")
-if rozpodil_kohren(S_list) < 0.7679:
+if rozpodil_kohren(S_list) < kohren_coef(3, 4, 0.05):
     print('Дисперсія однорідна')
 else:
     print('Дисперсія не однорідна')

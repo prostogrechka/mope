@@ -3,6 +3,20 @@ import sklearn.linear_model as lm
 from scipy.stats import f, t
 from pyDOE2 import *
 from functools import partial
+from time import time
+
+
+def timeit(func):
+    def wrapper(*args, **kwargs):
+        start = time()
+        result = func(*args, **kwargs)
+        end = (time() - start) * 1000
+        print("-" * 20)
+        print(f'Час знаходження: {end:} мс')
+        print("-" * 20)
+        return result
+
+    return wrapper
 
 
 def plan_matrix5(n, m):
@@ -103,6 +117,7 @@ def find_coef(X, Y, norm=False):
     return B
 
 
+@timeit
 def kriteriy_cochrana(y, y_aver, n, m):
     S_kv = s_kv(y, y_aver, n, m)
     Gp = max(S_kv) / sum(S_kv)
@@ -125,6 +140,7 @@ def bs(x, y_aver, n):
     return res
 
 
+@timeit
 def kriteriy_studenta(x, y, y_aver, n, m):
     S_kv = s_kv(y, y_aver, n, m)
     s_kv_aver = sum(S_kv) / n
@@ -135,6 +151,7 @@ def kriteriy_studenta(x, y, y_aver, n, m):
     return ts
 
 
+@timeit
 def fisherr(y, y_aver, y_new, n, m, d):
     S_ad = m / (n - d) * sum([(y_new[i] - y_aver[i]) ** 2 for i in range(len(y))])
     S_kv = s_kv(y, y_aver, n, m)
@@ -168,8 +185,8 @@ def start(X, Y, B, n, m):
     else:
         print("Необхідно збільшити кількість дослідів")
 
+    print('\nКритерій Стьюдента:\n', kriteriy_studenta(X[:, 1:], Y, y_aver, n, m))
     ts = kriteriy_studenta(X[:, 1:], Y, y_aver, n, m)
-    print('\nКритерій Стьюдента:\n', ts)
     res = [t for t in ts if t > t_student]
     final_k = [B[i] for i in range(len(ts)) if ts[i] in res]
     print('\nКоефіцієнти {} статистично незначущі, тому ми виключаємо їх з рівняння.'.format(
@@ -188,12 +205,12 @@ def start(X, Y, B, n, m):
         print('')
         return
     f4 = n - d
-
+    print('\nПеревірка адекватності за критерієм Фішера')
     F_p = fisherr(Y, y_aver, y_new, n, m, d)
 
     fisher = partial(f.ppf, q=0.95)
+
     f_t = fisher(dfn=f4, dfd=f3)
-    print('\nПеревірка адекватності за критерієм Фішера')
     print('Fp =', F_p)
     print('F_t =', f_t)
     if F_p < f_t:

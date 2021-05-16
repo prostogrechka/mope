@@ -142,6 +142,20 @@ def fisherr(y, y_aver, y_new, n, m, d):
 
     return S_ad / S_kv_aver
 
+def check_useless(X, Y, B, n, m):
+    f1 = m - 1
+    f2 = n
+    f3 = f1 * f2
+    q = 0.05
+    y_aver = [round(sum(i) / len(i), 3) for i in Y]
+    student = partial(t.ppf, q=1 - q)
+    t_student = student(df=f3)
+    ts = kriteriy_studenta(X[:, 1:], Y, y_aver, n, m)
+    res = [t for t in ts if t > t_student]
+    final_k = [B[i] for i in range(len(ts)) if ts[i] in res]
+    print('\nКоефіцієнти {} статистично незначущі'.format(
+        [round(i, 3) for i in B if i not in final_k]))
+
 
 def start(X, Y, B, n, m):
     print('\n\tПеревірка рівняння:')
@@ -152,9 +166,8 @@ def start(X, Y, B, n, m):
 
     student = partial(t.ppf, q=1 - q)
     t_student = student(df=f3)
-
     G_kr = cohren(f1, f2)
-
+    check_useless(X, Y, B, n, m)
     y_aver = [round(sum(i) / len(i), 3) for i in Y]
     print('\nСереднє значення y:', y_aver)
 
@@ -167,7 +180,7 @@ def start(X, Y, B, n, m):
         print(f'З ймовірністю {1 - q} дисперсії однорідні.')
     else:
         print("Необхідно збільшити кількість дослідів")
-
+    check_useless(X, Y, B, n, m)
     ts = kriteriy_studenta(X[:, 1:], Y, y_aver, n, m)
     print('\nКритерій Стьюдента:\n', ts)
     res = [t for t in ts if t > t_student]
@@ -180,15 +193,13 @@ def start(X, Y, B, n, m):
         y_new.append(regression([X[j][i] for i in range(len(ts)) if ts[i] in res], final_k))
 
     print(f'\nЗначення "y" з коефіцієнтами {final_k}')
-    print(y_new)
-
     d = len(res)
     if d >= n:
         print('\nF4 <= 0')
         print('')
         return
     f4 = n - d
-
+    check_useless(X, Y, B, n, m)
     F_p = fisherr(Y, y_aver, y_new, n, m, d)
 
     fisher = partial(f.ppf, q=0.95)
@@ -212,8 +223,6 @@ x_aver_min = sum([x[0] for x in x_range]) / 3
 y_max = 200 + int(x_aver_max)
 y_min = 200 + int(x_aver_min)
 X5, Y5, X5_norm = plan_matrix5(15, 3)
-
 y5_aver = [round(sum(i) / len(i), 3) for i in Y5]
 B5 = find_coef(X5, y5_aver)
-
 start(X5_norm, Y5, B5, 15, 3)
